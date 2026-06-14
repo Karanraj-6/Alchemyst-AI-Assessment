@@ -1,4 +1,12 @@
-# Full Stack AI Engineer Assignment
+# Agent Console
+
+Frontend application developed as part of the Full Stack AI Engineer Assignment.
+
+This directory contains the implementation of the agent console along with the original assignment documentation, requirements, and project details provided for the assessment. The assignment specification has been preserved below for reference.
+
+---
+
+## Full Stack AI Engineer Assignment
 
 ## Overview
 
