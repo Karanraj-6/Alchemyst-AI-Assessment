@@ -43,7 +43,31 @@ This document outlines the design decisions and technical rationales for the Alc
 
 ---
 
-## 4. Scalability Choices
+## 4. Identified Protocol Failure Modes & Race Conditions
+
+We have identified two critical architectural flaws within the WebSocket protocol design that can lead to race conditions, deadlocks, or artificial compliance failures under network stress:
+
+### 4.1 The `TOOL_ACK` Timeout Reconnection Race
+- **The Design**: The server expects a `TOOL_ACK` within 2 seconds of sending a `TOOL_CALL`, waiting up to 5 seconds before logging a protocol violation and force-sending the `TOOL_RESULT` anyway.
+- **The Failure Mode**:
+  1. If a connection drops (or a severe latency spike occurs) immediately after the server dispatches a `TOOL_CALL` (e.g., `seq = 10`), the client cannot successfully deliver the `TOOL_ACK`.
+  2. While the client is in the `RECONNECTING` loop, the server's 5-second timer continues. The server times out, logs a protocol violation, and outputs `TOOL_RESULT` (e.g., `seq = 11`) to its transaction queue.
+  3. The client reconnects and transmits a `RESUME` message. 
+     - If the client's highest processed sequence was `10` (`lastProcessedSeq = 10`), the server resumes replaying from `seq = 11`. The client will never send a `TOOL_ACK` for `seq = 10` because it has already advanced past it, but the server has already logged a violation for a drop it caused itself.
+     - If the client's highest processed sequence was `9` (the tool call was lost on the wire), the server replays `seq = 10` followed immediately by `seq = 11`. The client processes the tool call and dispatches a `TOOL_ACK`, but it arrives *after* the server has already replayed the result, leading to an out-of-order acknowledgment violation.
+- **Mitigation**: The server should suspend the tool-acknowledgement timer when a client socket disconnects, resuming only after a successful `RESUME` handshake has completed.
+
+### 4.2 The Interleaved `PING` Sequence Gap Block
+- **The Design**: `PING` messages are sent from the server interleaved in the same sequence number space (with a valid `seq` value).
+- **The Failure Mode**: 
+  1. In chaos mode, messages can arrive out-of-order. If a client receives a `PING` (e.g., `seq = 20`) out of order and processes it immediately to satisfy the 3-second `PONG` timeout, it sends the `PONG` response.
+  2. However, if the client processes this `PING` out of order without routing it through the reorder buffer, `nextExpectedSeq` is not advanced past `20`.
+  3. Subsequent packets (e.g., `seq = 21`, `seq = 22`) will arrive and be inserted into the min-heap buffer. Since the client is still waiting for `seq = 20` to satisfy the heap drain condition (`heap[0].seq === nextExpectedSeq`), the message loop will freeze permanently.
+- **Mitigation**: Route `PING` sequence numbers through the reorder buffer heap, allowing them to advance `nextExpectedSeq` sequentially, while still triggering the socket `PONG` transmission immediately upon raw packet receipt.
+
+---
+
+## 5. Scalability Choices
 
 ### Scaling to 50 Concurrent Agent Streams (Operations Dashboard)
 1. **Zustand Surgical Subscriptions**: Zustand allows component selectors (e.g. `useAgentStore(s => s.connectionState)`). This ensures components only re-render if their subscribed slice changes.

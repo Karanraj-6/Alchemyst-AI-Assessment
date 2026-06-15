@@ -138,10 +138,10 @@ export class WebSocketManager {
     this.hasExistingSession = true;
   }
 
-  private handleClose(_event: CloseEvent): void {
+  private handleClose(event: CloseEvent): void {
     this.ws = null;
 
-    if (this.intentionalClose) {
+    if (this.intentionalClose || event.reason === "replaced") {
       this.setConnectionState("DISCONNECTED");
       return;
     }

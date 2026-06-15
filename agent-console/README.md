@@ -189,7 +189,27 @@ flowchart TD
 
 ---
 
-## 6. Setup & Execution Instructions
+## 6. Visual Walkthrough & Screenshots
+
+### A. Streamed Response with Tool Call
+The chat interface shows streamed tokens frozen during tool executions, displaying arguments and results inside discrete inline cards without layout shift.
+![Streamed Response with Tool Call](/screenshots/hello_response.png)
+
+### B. Trace Timeline
+The scrollable right-hand timeline groups token updates and links tool calls/results bi-directionally with the chat panel.
+![Trace Timeline](/screenshots/filtered_timeline.png)
+
+### C. Context Inspector with Diffs
+A nested JSON tree visualizing context changes across snapshots. Green shows additions, red with strikethrough shows removals, and yellow shows edits. Includes the history scrubbing slider.
+![Context Inspector with Diffs](/screenshots/context_tree.png)
+
+### D. Chaos Mode Survival Demo
+A screen recording demonstrating resilience under drops, out-of-order sequence frames, rapid tool calls, empty-challenge corrupt pings, and massive context updates.
+![Chaos Survival Demo](/screenshots/chaos_survival_demo.webp)
+
+---
+
+## 7. Setup & Execution Instructions
 
 ### Installation
 ```bash

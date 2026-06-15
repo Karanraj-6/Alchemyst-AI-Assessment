@@ -218,9 +218,18 @@ export default function TimelinePanel({
       const query = searchQuery.toLowerCase();
       items = items.filter((item) => {
         if (item.kind === "batch") {
-          return item.batch.totalText.toLowerCase().includes(query);
+          return (
+            item.batch.totalText.toLowerCase().includes(query) ||
+            "token".includes(query)
+          );
         }
-        return getEventSummary(item.event).toLowerCase().includes(query);
+        const type = item.event.type.toLowerCase();
+        const badgeLabel = getBadgeLabel(item.event.type).toLowerCase();
+        return (
+          getEventSummary(item.event).toLowerCase().includes(query) ||
+          type.includes(query) ||
+          badgeLabel.includes(query)
+        );
       });
     }
 
