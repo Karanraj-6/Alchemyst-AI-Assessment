@@ -191,21 +191,47 @@ flowchart TD
 
 ## 6. Visual Walkthrough & Screenshots
 
+**Initial Clean Dashboard State:**
+![Initial Clean State](./public/screenshots/initial_clean_state.png)
+
 ### A. Streamed Response with Tool Call
 The chat interface shows streamed tokens frozen during tool executions, displaying arguments and results inside discrete inline cards without layout shift.
-![Streamed Response with Tool Call](/screenshots/hello_response.png)
+![Streamed Response with Tool Call](./public/screenshots/hello_response.png)
 
 ### B. Trace Timeline
 The scrollable right-hand timeline groups token updates and links tool calls/results bi-directionally with the chat panel.
-![Trace Timeline](/screenshots/filtered_timeline.png)
+![Trace Timeline](./public/screenshots/filtered_timeline.png)
 
 ### C. Context Inspector with Diffs
 A nested JSON tree visualizing context changes across snapshots. Green shows additions, red with strikethrough shows removals, and yellow shows edits. Includes the history scrubbing slider.
-![Context Inspector with Diffs](/screenshots/context_tree.png)
+![Context Inspector with Diffs](./public/screenshots/context_tree.png)
+
+#### What is going on in the Context Snapshots?
+You are seeing the AI agent's memory update in real time as it gathers information to answer your query.
+
+* **Snapshot 1 / 2 (6 Keys in Context):**
+  When you type `report`, the agent starts its task. The first thing it does is load the report's basic structure (like name, sections, page count, and access level) into its memory. At this starting step (sequence #1), it has 6 keys in its context.
+  
+  ![Context Snapshot 1](./public/screenshots/context-snapshot1.png)
+
+* **The Tool Call happens:**
+  The agent notices it doesn't have the actual numbers yet, so it stops text streaming and runs a tool (`lookup_metric`) to look up the Q3 YoY revenue and margins.
+
+* **Snapshot 2 / 2 (8 Keys in Context):**
+  Once the tool returns the data (around sequence #22), the agent updates its memory with what it just learned.
+  It adds 2 brand-new keys to the context (bringing the total from 6 to 8):
+  - `current_focus`: "operations"
+  - `extracted_metrics`: The values it looked up (revenue_yoy, operating_margin, etc.).
+  
+  These new keys are highlighted in green in Snapshot 2 because they were added to its memory after the tool call completed.
+  
+  ![Context Snapshot 2](./public/screenshots/context-snapshot2.png)
+
+Using the timeline scrubber slider allows you to scrub back to see the exact moment the agent learned those new numbers!
 
 ### D. Chaos Mode Survival Demo
-A screen recording demonstrating resilience under drops, out-of-order sequence frames, rapid tool calls, empty-challenge corrupt pings, and massive context updates.
-![Chaos Survival Demo](/screenshots/chaos_survival_demo.webp)
+A screen capture showing the application's resilience under packet drops, out-of-order sequence frames, rapid tool calls, empty-challenge corrupt pings, and massive context updates in chaos mode.
+![Chaos Survival Demo](./public/screenshots/report-chaos-mode.png)
 
 ---
 
