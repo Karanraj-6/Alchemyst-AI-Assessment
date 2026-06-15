@@ -109,7 +109,6 @@ export default function Home() {
       {/* Header */}
       <header className="app-header">
         <div className="app-header-title">
-          <div className="logo-icon">⚡</div>
           Agent Console
         </div>
         <ConnectionIndicator />
@@ -138,14 +137,14 @@ export default function Home() {
               onClick={() => setActiveTab("timeline")}
               id="tab-timeline"
             >
-              ⏱ Trace
+              Trace
             </button>
             <button
               className={`right-panel-tab ${activeTab === "context" ? "right-panel-tab--active" : ""}`}
               onClick={() => setActiveTab("context")}
               id="tab-context"
             >
-              📋 Context
+              Context
             </button>
           </div>
 

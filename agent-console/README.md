@@ -89,15 +89,15 @@ flowchart TD
     
     CheckPing -->|No| InsertHeap[2. Insert into Min-Heap ReorderBuffer]
     InsertHeap --> HeapSort[Heapify by seq]
-    HeapSort --> Drain{heap[0].seq == nextExpectedSeq?}
+    HeapSort --> Drain{"heap[0].seq == nextExpectedSeq?"}
     
     Drain -->|No| Block[Stop - wait for gap filling]
-    Drain -->|Yes| Extract[3. Extract min element & nextExpectedSeq++]
+    Drain -->|Yes| Extract["3. Extract min element & nextExpectedSeq++"]
     Extract --> DedupDrained{Is seq in Deduplicator Set?}
     DedupDrained -->|Yes| DiscardHeapDup[Discard duplicate]
-    DedupDrained -->|No| MarkProcessed[4. Mark processed in Deduplicator & Store]
+    DedupDrained -->|No| MarkProcessed["4. Mark processed in Deduplicator & Store"]
     MarkProcessed --> FSM[Update FSM State]
-    FSM --> StoreDispatch[5. Dispatch to Zustand Store]
+    FSM --> StoreDispatch["5. Dispatch to Zustand Store"]
     StoreDispatch --> Drain
 ```
 

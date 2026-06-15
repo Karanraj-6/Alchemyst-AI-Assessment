@@ -150,7 +150,6 @@ export default function ChatPanel({
       <div className="chat-messages" id="chat-messages">
         {allMessages.length === 0 && (
           <div className="chat-empty">
-            <div className="chat-empty-icon">⚡</div>
             <div className="chat-empty-text">Agent Console</div>
             <div className="chat-empty-hint">
               Send a message to the AI agent. Try keywords like &quot;hello&quot;,
